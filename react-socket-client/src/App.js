@@ -13,7 +13,7 @@ class App extends Component {
   constructor() {
     super();
     this.state = {
-      endpoint: "http://127.0.0.1:4001",
+      endpoint: "http://127.0.0.1:4001", //"http://159.65.191.40:4001"
       coins: ["BTC", "XRP", "DOGE"],
       BTC: emptyValue,
       XRP: emptyValue,
@@ -25,7 +25,7 @@ class App extends Component {
     if (Math.floor(price / 1000)) {
       return parseFloat(price).toFixed(0);
     }
-    if (Math.floor(price / 1)) {
+    if (Math.floor(price / 10)) {
       return parseFloat(price).toFixed(2);
     }
     return parseFloat(price).toFixed(4);

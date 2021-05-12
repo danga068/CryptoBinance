@@ -42,7 +42,7 @@ function bitBnsPriceUpdate() {
 
 const getApiAndEmit = async socket => {
 	binance.websockets.bookTickers( 'BTCUSDT', ticker => {
-		console.info("Price of BTC: ", ticker.bestBid);
+		// console.info("Price of BTC: ", ticker.bestBid);
 		socket.emit('price_change', {
           coin: "BTC",
           price: ticker.bestBid,
@@ -53,7 +53,7 @@ const getApiAndEmit = async socket => {
 	} );
 
 	binance.websockets.bookTickers( 'XRPUSDT', ticker => {
-		console.info("Price of XRP: ", ticker.bestBid);
+		// console.info("Price of XRP: ", ticker.bestBid);
 		if (Date.now() - LAST_CALL_TIME > 20000 || first_call) {
 			first_call = false
 			try {
@@ -73,7 +73,7 @@ const getApiAndEmit = async socket => {
 	} );
 
 	binance.websockets.bookTickers( 'DOGEUSDT', ticker => {
-		console.info("Price of DOGE: ", ticker.bestBid);
+		// console.info("Price of DOGE: ", ticker.bestBid);
 		socket.emit('price_change', {
           coin: "DOGE",
           price: ticker.bestBid,
