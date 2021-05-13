@@ -12,11 +12,12 @@ class App extends Component {
   constructor() {
     super();
     this.state = {
-      endpoint: "http://127.0.0.1:4001", //"http://159.65.191.40:4001"
-      coins: ["DOGE", "XRP", "ADA", "BTC"],
+      endpoint: "http://159.65.191.40:4001", //"http://127.0.0.1:4001"
+      coins: ["DOGE", "XRP", "ADA", "ETH", "BTC"],
       BTC: emptyValue,
       XRP: emptyValue,
       DOGE: emptyValue,
+      ETH: emptyValue,
       ADA: emptyValue
     };
   }
@@ -35,6 +36,25 @@ class App extends Component {
     const { endpoint } = this.state;
     const socket = socketIOClient(endpoint, {'force new connection': true});
     socket.on("price_change_btc", data => {
+      if (data.usdtprice === undefined) {
+        this.usdtprice = 0;
+      } else {
+        this.usdtprice = data.usdtprice;
+      }
+      this.inr_price = data.price * this.usdtprice;
+      document.title = this.state.BTC.USD
+      this.setState({
+        [data.coin]: {
+          USD: this.formatPrice(data.price),
+          INR: this.formatPrice(this.inr_price),
+          BNS: data.bprice,
+          USDT: this.usdtprice,
+          SYNC: Math.floor(data.lastsync/1000)
+        }
+      });
+    });
+
+    socket.on("price_change_eth", data => {
       if (data.usdtprice === undefined) {
         this.usdtprice = 0;
       } else {
@@ -95,7 +115,6 @@ class App extends Component {
         this.usdtprice = data.usdtprice;
       }
       this.inr_price = data.price * this.usdtprice;
-      document.title = this.state.DOGE.USD
       this.setState({
         [data.coin]: {
           USD: this.formatPrice(data.price),

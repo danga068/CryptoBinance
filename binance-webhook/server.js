@@ -52,6 +52,17 @@ const getApiAndEmit = async socket => {
         });
 	} );
 
+	binance.websockets.bookTickers( 'ETHUSDT', ticker => {
+		// console.info("Price of BTC: ", ticker.bestBid);
+		socket.emit('price_change_eth', {
+          coin: "ETH",
+          price: ticker.bestBid,
+          bprice: parseFloat(bitbns["ETH"]),
+          usdtprice: parseFloat(bitbns["USDT"]),
+          lastsync: (Date.now() - LAST_CALL_TIME)
+        });
+	} );
+
 	binance.websockets.bookTickers( 'XRPUSDT', ticker => {
 		// console.info("Price of XRP: ", ticker.bestBid);
 		if (Date.now() - LAST_CALL_TIME > 10000 || first_call) {
