@@ -43,7 +43,7 @@ function bitBnsPriceUpdate() {
 const getApiAndEmit = async socket => {
 	binance.websockets.bookTickers( 'BTCUSDT', ticker => {
 		// console.info("Price of BTC: ", ticker.bestBid);
-		socket.emit('price_change', {
+		socket.emit('price_change_btc', {
           coin: "BTC",
           price: ticker.bestBid,
           bprice: parseFloat(bitbns["BTC"]),
@@ -54,7 +54,7 @@ const getApiAndEmit = async socket => {
 
 	binance.websockets.bookTickers( 'XRPUSDT', ticker => {
 		// console.info("Price of XRP: ", ticker.bestBid);
-		if (Date.now() - LAST_CALL_TIME > 20000 || first_call) {
+		if (Date.now() - LAST_CALL_TIME > 10000 || first_call) {
 			first_call = false
 			try {
 	            bitBnsPriceUpdate();
@@ -63,7 +63,7 @@ const getApiAndEmit = async socket => {
 	          	console.log(e);
 	        }
 		}
-		socket.emit('price_change', {
+		socket.emit('price_change_xrp', {
           coin: "XRP",
           price: ticker.bestBid,
           bprice: parseFloat(bitbns["XRP"]),
@@ -74,10 +74,21 @@ const getApiAndEmit = async socket => {
 
 	binance.websockets.bookTickers( 'DOGEUSDT', ticker => {
 		// console.info("Price of DOGE: ", ticker.bestBid);
-		socket.emit('price_change', {
+		socket.emit('price_change_doge', {
           coin: "DOGE",
           price: ticker.bestBid,
           bprice: parseFloat(bitbns["DOGE"]),
+          usdtprice: parseFloat(bitbns["USDT"]),
+          lastsync: (Date.now() - LAST_CALL_TIME)
+        });
+	} );
+
+	binance.websockets.bookTickers( 'ADAUSDT', ticker => {
+		// console.info("Price of DOGE: ", ticker.bestBid);
+		socket.emit('price_change_ada', {
+          coin: "ADA",
+          price: ticker.bestBid,
+          bprice: parseFloat(bitbns["ADA"]),
           usdtprice: parseFloat(bitbns["USDT"]),
           lastsync: (Date.now() - LAST_CALL_TIME)
         });

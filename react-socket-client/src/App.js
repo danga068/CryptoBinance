@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import socketIOClient from "socket.io-client";
-import {LineChart} from 'react-easy-chart';
 
 const emptyValue = {
   USD: '',
@@ -14,10 +13,11 @@ class App extends Component {
     super();
     this.state = {
       endpoint: "http://127.0.0.1:4001", //"http://159.65.191.40:4001"
-      coins: ["BTC", "XRP", "DOGE"],
+      coins: ["DOGE", "XRP", "ADA", "BTC"],
       BTC: emptyValue,
       XRP: emptyValue,
       DOGE: emptyValue,
+      ADA: emptyValue
     };
   }
 
@@ -34,14 +34,68 @@ class App extends Component {
   componentDidMount() {
     const { endpoint } = this.state;
     const socket = socketIOClient(endpoint, {'force new connection': true});
-    socket.on("price_change", data => {
+    socket.on("price_change_btc", data => {
       if (data.usdtprice === undefined) {
         this.usdtprice = 0;
       } else {
         this.usdtprice = data.usdtprice;
       }
       this.inr_price = data.price * this.usdtprice;
-      document.title = this.state.BTC.USD
+      this.setState({
+        [data.coin]: {
+          USD: this.formatPrice(data.price),
+          INR: this.formatPrice(this.inr_price),
+          BNS: data.bprice,
+          USDT: this.usdtprice,
+          SYNC: Math.floor(data.lastsync/1000)
+        }
+      });
+    });
+
+    socket.on("price_change_ada", data => {
+      if (data.usdtprice === undefined) {
+        this.usdtprice = 0;
+      } else {
+        this.usdtprice = data.usdtprice;
+      }
+      this.inr_price = data.price * this.usdtprice;
+      this.setState({
+        [data.coin]: {
+          USD: this.formatPrice(data.price),
+          INR: this.formatPrice(this.inr_price),
+          BNS: data.bprice,
+          USDT: this.usdtprice,
+          SYNC: Math.floor(data.lastsync/1000)
+        }
+      });
+    });
+
+    socket.on("price_change_xrp", data => {
+      if (data.usdtprice === undefined) {
+        this.usdtprice = 0;
+      } else {
+        this.usdtprice = data.usdtprice;
+      }
+      this.inr_price = data.price * this.usdtprice;
+      this.setState({
+        [data.coin]: {
+          USD: this.formatPrice(data.price),
+          INR: this.formatPrice(this.inr_price),
+          BNS: data.bprice,
+          USDT: this.usdtprice,
+          SYNC: Math.floor(data.lastsync/1000)
+        }
+      });
+    });
+
+    socket.on("price_change_doge", data => {
+      if (data.usdtprice === undefined) {
+        this.usdtprice = 0;
+      } else {
+        this.usdtprice = data.usdtprice;
+      }
+      this.inr_price = data.price * this.usdtprice;
+      document.title = this.state.DOGE.USD
       this.setState({
         [data.coin]: {
           USD: this.formatPrice(data.price),
