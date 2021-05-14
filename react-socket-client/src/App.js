@@ -13,12 +13,13 @@ class App extends Component {
     super();
     this.state = {
       endpoint: "http://159.65.191.40:4001", //"http://127.0.0.1:4001"
-      coins: ["DOGE", "XRP", "ADA", "ETH", "BTC"],
+      coins: ["DOGE", "XRP", "ADA", "MATIC", "ETH", "BTC"],
       BTC: emptyValue,
       XRP: emptyValue,
       DOGE: emptyValue,
       ETH: emptyValue,
-      ADA: emptyValue
+      ADA: emptyValue,
+      MATIC: emptyValue
     };
   }
 
@@ -91,6 +92,24 @@ class App extends Component {
     });
 
     socket.on("price_change_xrp", data => {
+      if (data.usdtprice === undefined) {
+        this.usdtprice = 0;
+      } else {
+        this.usdtprice = data.usdtprice;
+      }
+      this.inr_price = data.price * this.usdtprice;
+      this.setState({
+        [data.coin]: {
+          USD: this.formatPrice(data.price),
+          INR: this.formatPrice(this.inr_price),
+          BNS: data.bprice,
+          USDT: this.usdtprice,
+          SYNC: Math.floor(data.lastsync/1000)
+        }
+      });
+    });
+
+    socket.on("price_change_matic", data => {
       if (data.usdtprice === undefined) {
         this.usdtprice = 0;
       } else {

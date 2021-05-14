@@ -104,6 +104,16 @@ const getApiAndEmit = async socket => {
           lastsync: (Date.now() - LAST_CALL_TIME)
         });
 	} );
+
+	binance.websockets.bookTickers( 'MATICUSDT', ticker => {
+		socket.emit('price_change_matic', {
+          coin: "MATIC",
+          price: ticker.bestBid,
+          bprice: parseFloat(bitbns["MATIC"]),
+          usdtprice: parseFloat(bitbns["USDT"]),
+          lastsync: (Date.now() - LAST_CALL_TIME)
+        });
+	} );
 };
 
 
