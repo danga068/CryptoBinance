@@ -13,9 +13,11 @@ app.use(bodyParser.json());
 const server = http.createServer(app)
 const io = socketIO(server, {'force new connection': true})
 
-var LAST_CALL_TIME = Date.now()
-var first_call = true
-var bitbns = {}
+var LAST_CALL_TIME = Date.now();
+var LAST_UPDATE_TIME = Date.now();
+var first_call = true;
+var error_msg = "TEST FWNRFKWFNR DEKWDFMEW";
+var bitbns = {};
 
 const binance = new Binance().options({
   APIKEY: '<key>',
@@ -28,7 +30,9 @@ function bitBnsPriceUpdate() {
     headers: {'user-agent': 'node.js'}
   }
   request('https://bitbns.com/order/getTickerWithVolume/', options, function (error, response, body) {
+  	console.log("error: ", error)
     if (error) {
+    	error_msg = error
       console.log("Error in Bitbns call", error);
     } else {
 	    bitbns_prices = JSON.parse(body) || [];
@@ -36,7 +40,7 @@ function bitBnsPriceUpdate() {
 	      bitbns[coin] = bitbns_prices[coin]["last_traded_price"];
 	    });
 	    if (bitbns_prices.length != 0) {
-	    	LAST_CALL_TIME = Date.now()
+	    	LAST_UPDATE_TIME = Date.now()
 	    }
 	}
   });
@@ -45,12 +49,23 @@ function bitBnsPriceUpdate() {
 const getApiAndEmit = async socket => {
 	binance.websockets.bookTickers( 'BTCUSDT', ticker => {
 		// console.info("Price of BTC: ", ticker.bestBid);
+		if (Date.now() - LAST_CALL_TIME > 10000 || first_call) {
+			try {
+	            bitBnsPriceUpdate();
+	        }
+	        catch (e) {
+	          	console.log(e);
+	        }
+	        first_call = false
+	        LAST_CALL_TIME = Date.now()
+		}
 		socket.emit('price_change_btc', {
           coin: "BTC",
           price: ticker.bestBid,
           bprice: parseFloat(bitbns["BTC"]),
           usdtprice: parseFloat(bitbns["USDT"]),
-          lastsync: (Date.now() - LAST_CALL_TIME)
+          lastsync: (Date.now() - LAST_UPDATE_TIME),
+          // error_msg: error_msg
         });
 	} );
 
@@ -61,27 +76,18 @@ const getApiAndEmit = async socket => {
           price: ticker.bestBid,
           bprice: parseFloat(bitbns["ETH"]),
           usdtprice: parseFloat(bitbns["USDT"]),
-          lastsync: (Date.now() - LAST_CALL_TIME)
+          lastsync: (Date.now() - LAST_UPDATE_TIME)
         });
 	} );
 
 	binance.websockets.bookTickers( 'XRPUSDT', ticker => {
 		// console.info("Price of XRP: ", ticker.bestBid);
-		if (Date.now() - LAST_CALL_TIME > 10000 || first_call) {
-			first_call = false
-			try {
-	            bitBnsPriceUpdate();
-	        }
-	        catch (e) {
-	          	console.log(e);
-	        }
-		}
 		socket.emit('price_change_xrp', {
           coin: "XRP",
           price: ticker.bestBid,
           bprice: parseFloat(bitbns["XRP"]),
           usdtprice: parseFloat(bitbns["USDT"]),
-          lastsync: (Date.now() - LAST_CALL_TIME)
+          lastsync: (Date.now() - LAST_UPDATE_TIME)
         });
 	} );
 
@@ -92,7 +98,7 @@ const getApiAndEmit = async socket => {
           price: ticker.bestBid,
           bprice: parseFloat(bitbns["DOGE"]),
           usdtprice: parseFloat(bitbns["USDT"]),
-          lastsync: (Date.now() - LAST_CALL_TIME)
+          lastsync: (Date.now() - LAST_UPDATE_TIME)
         });
 	} );
 
@@ -103,17 +109,18 @@ const getApiAndEmit = async socket => {
           price: ticker.bestBid,
           bprice: parseFloat(bitbns["ADA"]),
           usdtprice: parseFloat(bitbns["USDT"]),
-          lastsync: (Date.now() - LAST_CALL_TIME)
+          lastsync: (Date.now() - LAST_UPDATE_TIME)
         });
 	} );
 
 	binance.websockets.bookTickers( 'MATICUSDT', ticker => {
+		// console.info("Price of XRP: ", ticker.bestBid);
 		socket.emit('price_change_matic', {
           coin: "MATIC",
           price: ticker.bestBid,
           bprice: parseFloat(bitbns["MATIC"]),
           usdtprice: parseFloat(bitbns["USDT"]),
-          lastsync: (Date.now() - LAST_CALL_TIME)
+          lastsync: (Date.now() - LAST_UPDATE_TIME)
         });
 	} );
 };

@@ -19,7 +19,8 @@ class App extends Component {
       DOGE: emptyValue,
       ETH: emptyValue,
       ADA: emptyValue,
-      MATIC: emptyValue
+      MATIC: emptyValue,
+      ERR_MSG: "",
     };
   }
 
@@ -109,7 +110,7 @@ class App extends Component {
       });
     });
 
-    socket.on("price_change_matic", data => {
+    socket.on("price_change_doge", data => {
       if (data.usdtprice === undefined || data.usdtprice == 0) {
         this.usdtprice = dollar;
       } else {
@@ -127,7 +128,7 @@ class App extends Component {
       });
     });
 
-    socket.on("price_change_doge", data => {
+    socket.on("price_change_matic", data => {
       if (data.usdtprice === undefined || data.usdtprice == 0) {
         this.usdtprice = dollar;
       } else {
