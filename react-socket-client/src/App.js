@@ -37,7 +37,7 @@ class App extends Component {
     const { endpoint } = this.state;
     const socket = socketIOClient(endpoint, {'force new connection': true});
     socket.on("price_change_btc", data => {
-      if (data.usdtprice === undefined) {
+      if (data.usdtprice === undefined || data.usdtprice == 0) {
         this.usdtprice = dollar;
       } else {
         this.usdtprice = data.usdtprice;
@@ -56,7 +56,7 @@ class App extends Component {
     });
 
     socket.on("price_change_eth", data => {
-      if (data.usdtprice === undefined) {
+      if (data.usdtprice === undefined || data.usdtprice == 0) {
         this.usdtprice = dollar;
       } else {
         this.usdtprice = data.usdtprice;
@@ -74,7 +74,7 @@ class App extends Component {
     });
 
     socket.on("price_change_ada", data => {
-      if (data.usdtprice === undefined) {
+      if (data.usdtprice === undefined || data.usdtprice == 0) {
         this.usdtprice = dollar;
       } else {
         this.usdtprice = data.usdtprice;
@@ -92,7 +92,7 @@ class App extends Component {
     });
 
     socket.on("price_change_xrp", data => {
-      if (data.usdtprice === undefined) {
+      if (data.usdtprice === undefined || data.usdtprice == 0) {
         this.usdtprice = dollar;
       } else {
         this.usdtprice = data.usdtprice;
@@ -110,7 +110,7 @@ class App extends Component {
     });
 
     socket.on("price_change_matic", data => {
-      if (data.usdtprice === undefined) {
+      if (data.usdtprice === undefined || data.usdtprice == 0) {
         this.usdtprice = dollar;
       } else {
         this.usdtprice = data.usdtprice;
@@ -128,7 +128,7 @@ class App extends Component {
     });
 
     socket.on("price_change_doge", data => {
-      if (data.usdtprice === undefined) {
+      if (data.usdtprice === undefined || data.usdtprice == 0) {
         this.usdtprice = dollar;
       } else {
         this.usdtprice = data.usdtprice;
