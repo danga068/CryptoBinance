@@ -35,7 +35,9 @@ function bitBnsPriceUpdate() {
 	    Object.keys(bitbns_prices).forEach(function(coin) {
 	      bitbns[coin] = bitbns_prices[coin]["last_traded_price"];
 	    });
-	    LAST_CALL_TIME = Date.now()
+	    if (bitbns_prices.length != 0) {
+	    	LAST_CALL_TIME = Date.now()
+	    }
 	}
   });
 }
