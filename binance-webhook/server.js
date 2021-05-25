@@ -122,7 +122,7 @@ const getApiAndEmit = async socket => {
         });
 
         diff = parseFloat(parseFloat(bitbns["ETH"]) - ticker.bestBid * parseFloat(bitbns["USDT"])).toFixed(0)
-        if (diff <= -100) {
+        if (diff <= -2000) {
         	sendPagerAlert("Price Diff " + diff + " Buy Buy !!!");
         }
 	} );
