@@ -17,6 +17,7 @@
     "ngrok": "^3.0.0",
     "node-binance-api": "^0.12.5",
     "package.json": "^2.0.1",
+    "pagerduty": "0.0.3",
     "redis": "^2.8.0",
     "request": "^2.88.2",
     "socket.io": "^2.4.1"

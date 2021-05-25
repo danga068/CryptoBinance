@@ -12,7 +12,7 @@ class App extends Component {
   constructor() {
     super();
     this.state = {
-      endpoint: "http://159.65.191.40:4001", //"http://127.0.0.1:4001"
+      endpoint: "http://159.65.191.40:4001", //"http://127.0.0.1:4001",
       coins: ["DOGE", "XRP", "ADA", "MATIC", "ETH", "BTC"],
       BTC: emptyValue,
       XRP: emptyValue,
@@ -49,6 +49,7 @@ class App extends Component {
         [data.coin]: {
           USD: this.formatPrice(data.price),
           INR: this.formatPrice(this.inr_price),
+          DIFF: this.formatPrice(data.bprice - this.formatPrice(this.inr_price)),
           BNS: data.bprice,
           USDT: this.usdtprice,
           SYNC: Math.floor(data.lastsync/1000)
@@ -67,6 +68,7 @@ class App extends Component {
         [data.coin]: {
           USD: this.formatPrice(data.price),
           INR: this.formatPrice(this.inr_price),
+          DIFF: this.formatPrice(data.bprice - this.formatPrice(this.inr_price)),
           BNS: data.bprice,
           USDT: this.usdtprice,
           SYNC: Math.floor(data.lastsync/1000)
@@ -85,6 +87,7 @@ class App extends Component {
         [data.coin]: {
           USD: this.formatPrice(data.price),
           INR: this.formatPrice(this.inr_price),
+          DIFF: this.formatPrice(data.bprice - this.formatPrice(this.inr_price)),
           BNS: data.bprice,
           USDT: this.usdtprice,
           SYNC: Math.floor(data.lastsync/1000)
@@ -103,6 +106,7 @@ class App extends Component {
         [data.coin]: {
           USD: this.formatPrice(data.price),
           INR: this.formatPrice(this.inr_price),
+          DIFF: this.formatPrice(data.bprice - this.formatPrice(this.inr_price)),
           BNS: data.bprice,
           USDT: this.usdtprice,
           SYNC: Math.floor(data.lastsync/1000)
@@ -121,6 +125,7 @@ class App extends Component {
         [data.coin]: {
           USD: this.formatPrice(data.price),
           INR: this.formatPrice(this.inr_price),
+          DIFF: this.formatPrice(data.bprice - this.formatPrice(this.inr_price)),
           BNS: data.bprice,
           USDT: this.usdtprice,
           SYNC: Math.floor(data.lastsync/1000)
@@ -139,6 +144,7 @@ class App extends Component {
         [data.coin]: {
           USD: this.formatPrice(data.price),
           INR: this.formatPrice(this.inr_price),
+          DIFF: this.formatPrice(data.bprice - this.formatPrice(this.inr_price)),
           BNS: data.bprice,
           USDT: this.usdtprice,
           SYNC: Math.floor(data.lastsync/1000)
@@ -157,10 +163,11 @@ class App extends Component {
             <table id="simple-board" align="center" bgcolor="#F2F1F1" width="90%">
               <tbody>
                 <tr height="40px">
-                  <td width="20%" bgcolor="#FDEBD0">COIN\PRICE</td>
-                  <td width="20%" bgcolor="#FDEBD0">Binance</td>
-                  <td width="20%" bgcolor="#FDEBD0">Binance INR</td>
-                  <td width="20%" bgcolor="#FDEBD0">Bitbns</td>
+                  <td width="10%" bgcolor="#FDEBD0">COIN\PRICE</td>
+                  <td width="15%" bgcolor="#FDEBD0">Binance</td>
+                  <td width="15%" bgcolor="#FDEBD0">Binance INR</td>
+                  <td width="15%" bgcolor="#FDEBD0">DIFF</td>
+                  <td width="15%" bgcolor="#FDEBD0">Bitbns</td>
                   <td width="20%" bgcolor="#FDEBD0">Bitbns USDT</td>
                 </tr>
                 {
@@ -170,6 +177,7 @@ class App extends Component {
                         <td bgcolor="#E6B0AA">{coin}</td>
                         <td bgcolor="#EBEDEF">${that.state[coin].USD}</td>
                         <td bgcolor="#EBEDEF">{'\u20B9'}{that.state[coin].INR}</td>
+                        <td bgcolor="#EBEDEF">{that.state[coin].DIFF}</td>
                         <td bgcolor="#EBEDEF">{'\u20B9'}{that.state[coin].BNS}</td>
                         <td bgcolor="#EBEDEF">{'\u20B9'} {that.state[coin].USDT} {"( "} {that.state[coin].SYNC} {" sec ago)"}</td>
                       </tr>

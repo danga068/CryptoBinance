@@ -15,6 +15,7 @@ const io = socketIO(server, {'force new connection': true})
 
 var LAST_CALL_TIME = Date.now();
 var LAST_UPDATE_TIME = Date.now();
+var LAST_PAGER = Date.now()-100000;
 var first_call = true;
 var error_msg = "TEST FWNRFKWFNR DEKWDFMEW";
 var bitbns = {};
@@ -24,13 +25,19 @@ const binance = new Binance().options({
   APISECRET: '<secret>'
 });
 
+var pager, PagerDuty;
+PagerDuty = require('pagerduty');
+
+pager = new PagerDuty({
+  serviceKey: 'bac2bfb5dee94408d011f7d1455f9d0f'
+});
+
 
 function bitBnsPriceUpdate() {
   var options = {
     headers: {'user-agent': 'node.js'}
   }
   request('https://bitbns.com/order/getTickerWithVolume/', options, function (error, response, body) {
-  	console.log("error: ", error)
     if (error) {
     	error_msg = error
       console.log("Error in Bitbns call", error);
@@ -44,6 +51,42 @@ function bitBnsPriceUpdate() {
 	    }
 	}
   });
+}
+
+function sendPagerAlert(message) {
+	if (Date.now() - LAST_PAGER < 300000) {
+		return 0;
+	}
+	LAST_PAGER = Date.now()
+	pager.create({
+	  description: message, 
+	  details: {},
+	  callback: function(err, response) {
+	    if (err) throw err;
+	 
+	    // pager.acknowledge({
+	    //   incidentKey: response.incident_key,
+	    //   description: 'Got the pager error!',
+	    //   details: {
+	    //     foo: 'bar'
+	    //   },
+	    //   callback: function(err, response) {
+	    //     if (err) throw err;
+	 
+	    //     pager.resolve({
+	    //       incidentKey: response.incident_key,
+	    //       description: 'Resolved the pager error!',
+	    //       details: {
+	    //         foo: 'bar'
+	    //       },
+	    //       callback: function(err, response) {
+	    //         if (err) throw err;
+	    //       }
+	    //     });
+	    //   }
+	    // });
+	  }
+});
 }
 
 const getApiAndEmit = async socket => {
@@ -70,7 +113,6 @@ const getApiAndEmit = async socket => {
 	} );
 
 	binance.websockets.bookTickers( 'ETHUSDT', ticker => {
-		// console.info("Price of BTC: ", ticker.bestBid);
 		socket.emit('price_change_eth', {
           coin: "ETH",
           price: ticker.bestBid,
@@ -78,6 +120,11 @@ const getApiAndEmit = async socket => {
           usdtprice: parseFloat(bitbns["USDT"]),
           lastsync: (Date.now() - LAST_UPDATE_TIME)
         });
+
+        diff = parseFloat(parseFloat(bitbns["ETH"]) - ticker.bestBid * parseFloat(bitbns["USDT"])).toFixed(0)
+        if (diff <= -100) {
+        	sendPagerAlert("Price Diff " + diff + " Buy Buy !!!");
+        }
 	} );
 
 	binance.websockets.bookTickers( 'XRPUSDT', ticker => {
