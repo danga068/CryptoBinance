@@ -119,16 +119,7 @@ const getApiAndEmit = async socket => {
 		usdtPrice = parseFloat(bitbns["USDT"]);
 		binanceInrPrice = binancePrice * usdtPrice;
 
-		socket.emit('price_change_eth', {
-          coin: "ETH",
-          price: binancePrice,
-          bprice: bnsPrice,
-          usdtprice: usdtPrice,
-          lastsync: (Date.now() - LAST_UPDATE_TIME)
-        });
-
-        diff = parseFloat(bnsPrice - binanceInrPrice).toFixed(0);
-        console.log(diff);
+		diff = parseFloat(bnsPrice - binanceInrPrice).toFixed(0);
         if (diff <= -2000) {
         	extra_details = {
         		coin: "ETH",
@@ -140,6 +131,14 @@ const getApiAndEmit = async socket => {
         	message = "ETH Price Diff " + diff + " Buy Buy !!!";
         	sendPagerAlert(message, extra_details);
         }
+
+		socket.emit('price_change_eth', {
+          coin: "ETH",
+          price: binancePrice,
+          bprice: bnsPrice,
+          usdtprice: usdtPrice,
+          lastsync: (Date.now() - LAST_UPDATE_TIME)
+        });
 	} );
 
 	binance.websockets.bookTickers( 'XRPUSDT', ticker => {
