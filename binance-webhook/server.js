@@ -2,6 +2,7 @@ const express = require('express')
 const http = require('http')
 const socketIO = require('socket.io')
 var request = require('request');
+const binance_api = require('binance');
 const bodyParser = require("body-parser");
 const Binance = require('node-binance-api');
 
@@ -19,6 +20,8 @@ var LAST_PAGER = Date.now()-10000000;
 var first_call = true;
 var error_msg = "TEST FWNRFKWFNR DEKWDFMEW";
 var bitbns = {};
+
+const binanceWS = new binance_api.BinanceWS(true);
 
 const binance = new Binance().options({
   APIKEY: '<key>',
@@ -90,7 +93,15 @@ function sendPagerAlert(message, extra_details={}) {
 }
 
 const getApiAndEmit = async socket => {
-	binance.websockets.bookTickers( 'BTCUSDT', ticker => {
+
+
+
+	// binanceWS.onTrade('BTCUSDT', data => {
+	//     console.log(data);
+	// });
+
+	// binance.websockets.bookTickers( 'BTCUSDT', ticker => {
+	binanceWS.onTrade('BTCUSDT', data => {
 		// console.info("Price of BTC: ", ticker.bestBid);
 		if (Date.now() - LAST_CALL_TIME > 10000 || first_call) {
 			try {
@@ -102,9 +113,17 @@ const getApiAndEmit = async socket => {
 	        first_call = false
 	        LAST_CALL_TIME = Date.now()
 		}
-		socket.emit('price_change_btc', {
+		// socket.emit('price_change_btc', {
+  //         coin: "BTC",
+  //         price: ticker.bestBid,
+  //         bprice: parseFloat(bitbns["BTC"]),
+  //         usdtprice: parseFloat(bitbns["USDT"]),
+  //         lastsync: (Date.now() - LAST_UPDATE_TIME),
+  //         // error_msg: error_msg
+  //       });
+  		socket.emit('price_change_btc', {
           coin: "BTC",
-          price: ticker.bestBid,
+          price: data["price"],
           bprice: parseFloat(bitbns["BTC"]),
           usdtprice: parseFloat(bitbns["USDT"]),
           lastsync: (Date.now() - LAST_UPDATE_TIME),
@@ -112,9 +131,10 @@ const getApiAndEmit = async socket => {
         });
 	} );
 
-	binance.websockets.bookTickers( 'ETHUSDT', ticker => {
+	// binance.websockets.bookTickers( 'ETHUSDT', ticker => {
+	binanceWS.onTrade('ETHUSDT', data => {
 
-		binancePrice = ticker.bestBid;
+		binancePrice = data["price"];
 		bnsPrice = parseFloat(bitbns["ETH"]);
 		usdtPrice = parseFloat(bitbns["USDT"]);
 		binanceInrPrice = binancePrice * usdtPrice;
@@ -141,44 +161,41 @@ const getApiAndEmit = async socket => {
         });
 	} );
 
-	binance.websockets.bookTickers( 'XRPUSDT', ticker => {
-		// console.info("Price of XRP: ", ticker.bestBid);
+	// binance.websockets.bookTickers( 'XRPUSDT', ticker => {
+	binanceWS.onTrade('XRPUSDT', data => {
 		socket.emit('price_change_xrp', {
           coin: "XRP",
-          price: ticker.bestBid,
+          price: data["price"],
           bprice: parseFloat(bitbns["XRP"]),
           usdtprice: parseFloat(bitbns["USDT"]),
           lastsync: (Date.now() - LAST_UPDATE_TIME)
         });
 	} );
 
-	binance.websockets.bookTickers( 'DOGEUSDT', ticker => {
-		// console.info("Price of DOGE: ", ticker.bestBid);
+	binanceWS.onTrade('DOGEUSDT', data => {
 		socket.emit('price_change_doge', {
           coin: "DOGE",
-          price: ticker.bestBid,
+          price: data["price"],
           bprice: parseFloat(bitbns["DOGE"]),
           usdtprice: parseFloat(bitbns["USDT"]),
           lastsync: (Date.now() - LAST_UPDATE_TIME)
         });
 	} );
 
-	binance.websockets.bookTickers( 'ADAUSDT', ticker => {
-		// console.info("Price of DOGE: ", ticker.bestBid);
+	binanceWS.onTrade('ADAUSDT', data => {
 		socket.emit('price_change_ada', {
           coin: "ADA",
-          price: ticker.bestBid,
+          price: data["price"],
           bprice: parseFloat(bitbns["ADA"]),
           usdtprice: parseFloat(bitbns["USDT"]),
           lastsync: (Date.now() - LAST_UPDATE_TIME)
         });
 	} );
 
-	binance.websockets.bookTickers( 'MATICUSDT', ticker => {
-		// console.info("Price of XRP: ", ticker.bestBid);
+	binanceWS.onTrade('MATICUSDT', data => {
 		socket.emit('price_change_matic', {
           coin: "MATIC",
-          price: ticker.bestBid,
+          price: data["price"],
           bprice: parseFloat(bitbns["MATIC"]),
           usdtprice: parseFloat(bitbns["USDT"]),
           lastsync: (Date.now() - LAST_UPDATE_TIME)
