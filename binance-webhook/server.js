@@ -15,7 +15,7 @@ const io = socketIO(server, {'force new connection': true})
 
 var LAST_CALL_TIME = Date.now();
 var LAST_UPDATE_TIME = Date.now();
-var LAST_PAGER = Date.now()-100000;
+var LAST_PAGER = Date.now()-10000000;
 var first_call = true;
 var error_msg = "TEST FWNRFKWFNR DEKWDFMEW";
 var bitbns = {};
@@ -53,14 +53,14 @@ function bitBnsPriceUpdate() {
   });
 }
 
-function sendPagerAlert(message) {
+function sendPagerAlert(message, extra_details={}) {
 	if (Date.now() - LAST_PAGER < 300000) {
 		return 0;
 	}
 	LAST_PAGER = Date.now()
 	pager.create({
 	  description: message, 
-	  details: {},
+	  details: extra_details,
 	  callback: function(err, response) {
 	    if (err) throw err;
 	 
@@ -113,17 +113,32 @@ const getApiAndEmit = async socket => {
 	} );
 
 	binance.websockets.bookTickers( 'ETHUSDT', ticker => {
+
+		binancePrice = ticker.bestBid;
+		bnsPrice = parseFloat(bitbns["ETH"]);
+		usdtPrice = parseFloat(bitbns["USDT"]);
+		binanceInrPrice = binancePrice * usdtPrice;
+
 		socket.emit('price_change_eth', {
           coin: "ETH",
-          price: ticker.bestBid,
-          bprice: parseFloat(bitbns["ETH"]),
-          usdtprice: parseFloat(bitbns["USDT"]),
+          price: binancePrice,
+          bprice: bnsPrice,
+          usdtprice: usdtPrice,
           lastsync: (Date.now() - LAST_UPDATE_TIME)
         });
 
-        diff = parseFloat(parseFloat(bitbns["ETH"]) - ticker.bestBid * parseFloat(bitbns["USDT"])).toFixed(0)
+        diff = parseFloat(bnsPrice - binanceInrPrice).toFixed(0);
+        console.log(diff);
         if (diff <= -2000) {
-        	sendPagerAlert("Price Diff " + diff + " Buy Buy !!!");
+        	extra_details = {
+        		coin: "ETH",
+        		bnsPrice: bnsPrice,
+        		binanceInrPrice: binanceInrPrice,
+        		binancePrice: binancePrice,
+        		usdtPrice: usdtPrice
+        	}
+        	message = "ETH Price Diff " + diff + " Buy Buy !!!";
+        	sendPagerAlert(message, extra_details);
         }
 	} );
 
